@@ -1,0 +1,6 @@
+import Main_Code
+
+greenback_hotel = Main_Code.Hotel(59, "Greenback", 4)
+greenback_hotel.show_rooms()
+greenback_hotel.hourly_order(3)
+greenback_hotel.return-order(1)
