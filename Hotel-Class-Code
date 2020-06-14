@@ -1,0 +1,256 @@
+import datetime
+import csv
+import json
+
+
+
+class Hotel:
+
+    def __init__(self, rooms, name, stars):
+        self.rooms = rooms
+        self.name = name
+        self.stars = stars
+        self.price_multiplier = stars/2.5
+
+
+    def show_rooms(self):
+        with open('doc_file.csv', 'r') as r:
+            reader = csv.reader(r)
+            sum_list = []
+            for row in reader:
+                sum_list.append(int(row[4]))
+
+            sum_of_list = sum(sum_list)
+        print(self.rooms - sum_of_list)
+
+    def _valid_order_check(self, num_of_rooms):
+        try:
+            request = int(num_of_rooms)
+        except:
+            return False
+
+        if request <= 0:
+            return False
+
+        with open('doc_file.csv', 'r') as r:
+            reader = csv.reader(r)
+            sum_list = []
+            for row in reader:
+                sum_list.append(int(row[4]))
+
+            sum_of_list = sum(sum_list)
+        if num_of_rooms > self.rooms-sum_of_list:
+            return False
+
+
+        else:
+            return True
+
+    @staticmethod
+    def _create_order(price, order_type, time, num_of_rooms):
+        str_order_numbers = []
+        with open('doc_file.csv', 'r') as r:
+            reader = csv.reader(r)
+            for row in reader:
+                str_order_numbers.append(row[0])
+        order_numbers = [int(num) for num in str_order_numbers]
+        try:
+            last_element = order_numbers.pop()
+        except Exception:
+            last_element = 0
+
+        order_number = last_element + 1
+        with open('doc_file.csv', 'a') as w:
+            writer = csv.writer(w)
+            writer.writerow([order_number, price, order_type, time, num_of_rooms, 'open'])
+        return(order_number)
+
+
+
+
+    def hourly_order(self, num_of_rooms):
+        if self._valid_order_check(num_of_rooms):
+            now = datetime.datetime.now()
+            hour_now = now.hour
+            day_now = now.day
+            month_now = now.month
+            year_now = now.year
+            date = now.date()
+            print(f"You have requested {num_of_rooms} room(s) at {hour_now} o' Clock on {date}.")
+            if num_of_rooms <= 1:
+                print(f'You will be charged ${round((self.price_multiplier * 200) * num_of_rooms)} for every hour from now.')
+                print(f"Order Number: {Hotel._create_order(round((self.price_multiplier * 200) * num_of_rooms),'hourly_order', [hour_now, day_now, month_now, year_now], num_of_rooms)}")
+            else:
+                print(f'You qualify for our discount program! You will be charged ${round((self.price_multiplier * 200) * num_of_rooms) * 0.80} for every hour from now.')
+                print(f"Order Number: {Hotel._create_order(round((self.price_multiplier * 200) * num_of_rooms) * 0.80, 'hourly_order', [hour_now, day_now, month_now, year_now], num_of_rooms)}")
+            print(f'Enjoy your stay at {self.name} hotel!')
+        else:
+            print('Invalid Request')
+
+    def daily_order(self, num_of_rooms):
+        if self._valid_order_check(num_of_rooms):
+            now = datetime.datetime.now()
+            hour_now = now.hour
+            day_now = now.day
+            month_now = now.month
+            year_now = now.year
+            date = now.date()
+            print(f"You have requested {num_of_rooms} room(s) at {hour_now} O' Clock on {date}.")
+            if num_of_rooms <= 1:
+                print(f'You will be charged ${round((self.price_multiplier * 4000) * num_of_rooms)} for every day from now.')
+                print(f"Order Number: {Hotel._create_order(round((self.price_multiplier * 4000) * num_of_rooms), 'daily_order', [hour_now, day_now, month_now, year_now], num_of_rooms)}")
+            else:
+                print(f'You qualify for our discount program! You will be charged ${round((self.price_multiplier * 4000) * num_of_rooms) * 0.80} for every day from now.')
+                print(f"Order Number: {Hotel._create_order(round((self.price_multiplier * 4000) * num_of_rooms) * 0.80, 'daily_order', [hour_now, day_now, month_now, year_now], num_of_rooms)}")
+            print(f'Enjoy your stay at the {self.name} hotel!')
+
+        else:
+            print('Invalid Request')
+
+    def weekly_order(self, num_of_rooms):
+        if self._valid_order_check(num_of_rooms):
+            now = datetime.datetime.now()
+            hour_now = now.hour
+            day_now = now.day
+            month_now = now.month
+            year_now = now.year
+            date = now.date()
+            print(f"You have requested {num_of_rooms} room(s) at {hour_now} O' Clock on {date}.")
+            if num_of_rooms <= 1:
+                print(f'You will be charged ${round((self.price_multiplier * 20000) * num_of_rooms, 1)} for every week from now.')
+                print(f"Order Number: {Hotel._create_order(round((self.price_multiplier * 20000) * num_of_rooms), 'weekly_order', [hour_now, day_now, month_now, year_now], num_of_rooms)}")
+            else:
+                print(f'You qualify for our discount program! You will be charged ${round((self.price_multiplier * 20000) * num_of_rooms) * 0.80} for every week from now.')
+                print(f"Order Number: {Hotel._create_order(round((self.price_multiplier * 20000) * num_of_rooms) * 0.80,'weekly_order', [hour_now, day_now, month_now, year_now], num_of_rooms)}")
+            print(f'Enjoy your stay at the {self.name} hotel!')
+
+        else:
+            print('Invalid Request')
+
+    def return_order(self, order_number):
+        with open('doc_file.csv', 'r') as r:
+            reader = csv.reader(r)
+            existing_order_numbers = []
+            for row in reader:
+                existing_order_numbers.append(int(row[0]))
+                if int(row[0]) == order_number:
+                    main_row = row
+        if int(order_number) not in existing_order_numbers:
+            print('Order number does not exist')
+            return
+
+        case_status = main_row[5]
+        if case_status == 'open':
+            pass
+        else:
+            print('Case has already been closed')
+            return
+
+        case_type = main_row[2]
+        times = json.loads(main_row[3])
+
+        now = datetime.datetime.now()
+        order_year = times[3]
+        current_year = now.year
+        difference_bet_year = current_year - order_year
+        order_month = times[2]
+        current_month = now.month
+        month_dict = {1: 31, 2: 28, 3: 31, 4: 30, 5: 31, 6: 30, 7: 31, 8: 31, 9: 30, 10: 31, 11: 30, 12: 31}
+        days_between_months = []
+        for i in range(order_month, current_month):
+            days_between_months.append(month_dict[i])
+
+        sum_days_months = sum(days_between_months)
+        days_between_order = sum_days_months-times[1] + now.day
+        for i in range(difference_bet_year):
+            days_between_order += 365
+
+        if difference_bet_year > 0:
+            list_of_dates = []
+            for i in range(now.month, 12):
+                list_of_dates.append(month_dict[i])
+            sum_list_of_dates = sum(list_of_dates)
+            days_between_order = days_between_order - sum_list_of_dates
+
+
+        if case_type == 'hourly_order':
+            hours_between_order = days_between_order * 24 + now.hour - times[0]
+            if hours_between_order > 0:
+                print(f'You have made an hourly order and have held {main_row[4]} room(s) for {hours_between_order} hour(s)')
+                price = float(main_row[1]) * hours_between_order
+                print(f'Your total bill amounts to ${price}')
+                print(f'We hope you enjoyed your stay at {self.name} hotel!')
+                with open('doc_file.csv', 'r') as r:
+                    reader = csv.reader(r)
+                    list_of_orders = []
+                    for row in reader:
+                        list_of_orders.append(row)
+
+                    with open('doc_file.csv', 'w') as w:
+                        writer = csv.writer(w)
+                        for line in list_of_orders:
+                            if int(line[0]) == order_number:
+                                writer.writerow([line[0], line[1], line[2], line[3], 0, 'closed'])
+                            else:
+                                writer.writerow([line[0], line[1], line[2], line[3], line[4], line[5]])
+
+            else:
+                print('You still have time before first hour passes!')
+                return
+
+        if case_type == 'daily_order':
+            if days_between_order > 0:
+                print(f'You have made an daily order and have held {main_row[4]} room(s) for {days_between_order} days(s)')
+                price = float(main_row[1]) * days_between_order
+                print(f'Your total bill amounts to ${price}')
+                print(f'We hope you enjoyed your stay at {self.name} hotel!')
+                with open('doc_file.csv', 'r') as r:
+                    reader = csv.reader(r)
+                    list_of_orders = []
+                    for row in reader:
+                        list_of_orders.append(row)
+
+                    with open('doc_file.csv', 'w') as w:
+                        writer = csv.writer(w)
+                        for line in list_of_orders:
+                            if int(line[0]) == order_number:
+                                writer.writerow([line[0], line[1], line[2], line[3], 0, 'closed'])
+                            else:
+                                writer.writerow([line[0], line[1], line[2], line[3], line[4], line[5]])
+
+            else:
+                print('You still have time before first day passes!')
+
+        if case_type == 'weekly_order':
+            weeks_between_order = days_between_order//7
+            days_left = days_between_order%7
+            if weeks_between_order > 0:
+                if days_left > 0:
+                    print(f'You have made an weekly order and have held {main_row[4]} room(s) for {weeks_between_order} week(s) and {days_left} days(s)')
+                    print(f'You will be charged now, but you have {7-days_left} days(s) remaining in the hotel')
+                    price = (weeks_between_order + 1) * int(main_row[1])
+                    print(f'Your total bill amounts to: ${price}')
+                else:
+                    price = weeks_between_order * int(main_row[1])
+                    print(f'You have made an weekly order and have held {main_row[4]} room(s) for {weeks_between_order} week(s)')
+                    print(f'Your total bill amounts to: ${price}')
+                print(f'We hope you enjoyed your stay at {self.name} hotel!')
+                with open('doc_file.csv', 'r') as r:
+                    reader = csv.reader(r)
+                    list_of_orders = []
+                    for row in reader:
+                        list_of_orders.append(row)
+
+                    with open('doc_file.csv', 'w') as w:
+                        writer = csv.writer(w)
+                        for line in list_of_orders:
+                            if int(line[0]) == order_number:
+                                writer.writerow([line[0], line[1], line[2], line[3], 0, 'closed'])
+                            else:
+                                writer.writerow([line[0], line[1], line[2], line[3], line[4], line[5]])
+
+            else:
+                print('You still have time before first week passes!')
+
+
+
